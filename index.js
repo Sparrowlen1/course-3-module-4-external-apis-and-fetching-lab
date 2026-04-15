@@ -1,22 +1,16 @@
-/**
- * Jest Test Suite for Weather Alerts Application
- * Run with: npm test (after installing jest and setting up)
- */
-
 // Mock the DOM environment
 const fs = require('fs');
 const path = require('path');
 
 // Setup jsdom for DOM testing
 const { JSDOM } = require('jsdom');
-
 // Load HTML and JS
 const html = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf8');
 let dom;
 let document;
 let window;
 
-// Import functions (will be mocked partially)
+// Import functions 
 let {
   isValidStateAbbr,
   fetchWeatherAlerts,
@@ -63,8 +57,7 @@ beforeEach(() => {
   }
 });
 
-describe('Weather Alerts Application Tests', () => {
-  
+describe('Weather Alerts Application Tests', () => { 
   // Test 1: fetch request is made using the input state abbreviation
   test('fetch request uses correct state abbreviation from input', async () => {
     const mockResponse = {
@@ -75,18 +68,15 @@ describe('Weather Alerts Application Tests', () => {
       })
     };
     global.fetch.mockResolvedValue(mockResponse);
-    
     // Simulate setting input and calling handleGetWeatherAlerts
     const stateInput = document.getElementById('state-input');
     stateInput.value = 'MN';
-    
     // Since handleGetWeatherAlerts calls fetchWeatherAlerts internally
     await handleGetWeatherAlerts();
     
     expect(global.fetch).toHaveBeenCalledTimes(1);
     expect(global.fetch).toHaveBeenCalledWith('https://api.weather.gov/alerts/active?area=MN');
   });
-  
   // Test 2: successful fetch displays title and number of alerts
   test('successful fetch displays title with number of alerts', async () => {
     const mockData = {
@@ -126,7 +116,6 @@ describe('Weather Alerts Application Tests', () => {
     
     expect(stateInput.value).toBe('');
   });
-  
   // Test 4: When unsuccessful request is made, error message is displayed
   test('unsuccessful request (network error) displays error message', async () => {
     global.fetch.mockRejectedValue(new Error('Network failure'));
@@ -151,7 +140,6 @@ describe('Weather Alerts Application Tests', () => {
     
     const errorDiv = document.getElementById('error-message');
     expect(errorDiv.classList.contains('hidden')).toBe(false);
-    
     // Now mock successful fetch
     global.fetch.mockClear();
     const mockSuccessResponse = {
@@ -168,7 +156,6 @@ describe('Weather Alerts Application Tests', () => {
     expect(errorDiv.classList.contains('hidden')).toBe(true);
     expect(errorDiv.textContent).toBe('');
   });
-  
   // Additional Test: Invalid input validation
   test('invalid state abbreviation shows error and no fetch is made', async () => {
     const stateInput = document.getElementById('state-input');
@@ -181,8 +168,7 @@ describe('Weather Alerts Application Tests', () => {
     expect(errorDiv.textContent).toContain('exactly 2 capital letters');
     expect(global.fetch).not.toHaveBeenCalled();
   });
-  
-  // Additional Test: Empty input error
+  // Additional Test for Empty input error
   test('empty input shows validation error', async () => {
     const stateInput = document.getElementById('state-input');
     stateInput.value = '';
@@ -194,8 +180,7 @@ describe('Weather Alerts Application Tests', () => {
     expect(errorDiv.textContent).toContain('Please enter a state abbreviation');
     expect(global.fetch).not.toHaveBeenCalled();
   });
-  
-  // Async handling: no unhandled promise rejections
+  // Async handling to prevent unhandled promise rejections
   test('no unhandled promise rejections on API failure', async () => {
     const rejectionHandler = jest.fn();
     process.on('unhandledRejection', rejectionHandler);
@@ -209,7 +194,7 @@ describe('Weather Alerts Application Tests', () => {
     // Wait for any microtasks
     await new Promise(process.nextTick);
     
-    // No unhandled rejection should be thrown (caught in catch)
+    // No unhandled rejection should be thrown 
     expect(rejectionHandler).not.toHaveBeenCalled();
     
     process.off('unhandledRejection', rejectionHandler);
